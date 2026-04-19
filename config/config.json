@@ -1,0 +1,103 @@
+{
+  "lunarcrush": {
+    "api_key": "YOUR_LUNARCRUSH_API_KEY",
+    "base_url": "https://lunarcrush.com/api4",
+    "fetch_interval_seconds": 180,
+    "top_coins_limit": 100
+  },
+  "hyperliquid": {
+    "mainnet_url": "https://api.hyperliquid.xyz",
+    "testnet_url": "https://api.hyperliquid-testnet.xyz",
+    "use_testnet": false,
+    "wallet_address": "YOUR_WALLET_ADDRESS",
+    "private_key": "YOUR_PRIVATE_KEY",
+    "api_wallet_address": "YOUR_API_WALLET_ADDRESS"
+  },
+  "trading": {
+    "initial_capital": 1000,
+    "max_positions": 3,
+    "max_capital_in_use_percent": 80,
+    "reserve_percent": 10,
+    "daily_loss_limit_percent": 8,
+    "total_loss_limit_percent": 20,
+    "profit_lock_threshold_percent": 15
+  },
+  "strategies": {
+    "momentum": {
+      "enabled": true,
+      "capital_percent": 40,
+      "leverage": 3,
+      "max_positions": 2,
+      "target_profit_percent": 8,
+      "stop_loss_percent": 5,
+      "trailing_stop_trigger_percent": 5,
+      "trailing_stop_percent": 2.5,
+      "time_stop_hours": 6,
+      "thresholds": {
+        "social_volume_change_min": 0.40,
+        "interactions_change_min": 0.35,
+        "sentiment_min": 60,
+        "price_change_1h_min": 0.5,
+        "volume_change_min": 0.25
+      },
+      "capital_allocation": 0.4,
+      "social_volume_min": 0.40,
+      "sentiment_min": 60
+    },
+    "altrank": {
+      "enabled": true,
+      "capital_percent": 30,
+      "leverage": 2,
+      "max_positions": 1,
+      "target_profit_percent": 15,
+      "stop_loss_percent": 6,
+      "trailing_stop_trigger_percent": 10,
+      "trailing_stop_percent": 4,
+      "time_stop_hours": 12,
+      "thresholds": {
+        "altrank_improvement_min": 20,
+        "altrank_max": 100,
+        "social_dominance_change_min": 0.5,
+        "sentiment_min": 60,
+        "price_change_24h_min": 3,
+        "market_cap_rank_min": 50
+      },
+      "capital_allocation": 0.3,
+      "rank_improve_min": 20,
+      "top_coins": 100
+    },
+    "reversal": {
+      "enabled": true,
+      "capital_percent": 20,
+      "leverage": 2,
+      "max_positions": 1,
+      "target_profit_percent": 12,
+      "stop_loss_percent": 7,
+      "trailing_stop_trigger_percent": 8,
+      "trailing_stop_percent": 3,
+      "time_stop_hours": 24,
+      "thresholds": {
+        "price_change_24h_max": -5,
+        "galaxy_score_min": 70,
+        "sentiment_min": 60,
+        "social_volume_change_min": 0.3
+      },
+      "capital_allocation": 0.2,
+      "price_drop_min": -5,
+      "galaxy_score_min": 70
+    }
+  },
+  "monitoring": {
+    "position_check_interval_seconds": 30,
+    "log_level": "INFO",
+    "enable_alerts": true,
+    "alert_on_trade": true,
+    "alert_on_profit_threshold": 100,
+    "alert_on_loss_threshold": 50
+  },
+  "dashboard": {
+    "enabled": true,
+    "port": 5000,
+    "host": "0.0.0.0"
+  }
+}
