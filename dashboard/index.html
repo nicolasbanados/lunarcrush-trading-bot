@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUNARCRUSH TRADING BOT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            border: 1px solid #333;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 16px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 30px;
+            font-size: 12px;
+            align-items: center;
+        }
+
+        .header-item {
+            text-align: right;
+        }
+
+        .header-label {
+            color: #666;
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .header-value {
+            font-size: 14px;
+        }
+
+        .bot-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0f0;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.paused {
+            background: #f80;
+            animation: none;
+        }
+
+        .status-indicator.stopped {
+            background: #f00;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            border: 1px solid #333;
+            padding: 20px;
+            min-height: 100px;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .metric-sub {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .positive { color: #0f0; }
+        .negative { color: #f00; }
+
+        .section {
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .bot-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .strategy-card {
+            border: 1px solid #333;
+            padding: 20px;
+        }
+
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .strategy-name {
+            font-size: 13px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .strategy-name:hover {
+            color: #0f0;
+        }
+
+        .info-icon {
+            font-size: 11px;
+            color: #666;
+            border: 1px solid #666;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .strategy-name:hover .info-icon {
+            color: #0f0;
+            border-color: #0f0;
+        }
+
+        .strategy-status {
+            font-size: 10px;
+            color: #0f0;
+        }
+
+        .strategy-status.paused {
+            color: #f80;
+        }
+
+        .control-row {
+            margin-bottom: 15px;
+        }
+
+        .control-label {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider {
+            width: 100%;
+            height: 2px;
+            background: #222;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            cursor: pointer;
+            border: 1px solid #fff;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            cursor: pointer;
+            border: 1px solid #fff;
+        }
+
+        .strategy-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+            font-size: 11px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 9px;
+            margin-bottom: 3px;
+        }
+
+        .button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .button:hover {
+            background: #ddd;
+        }
+
+        .button-outline {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        .button-outline:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .button-pause {
+            background: transparent;
+            color: #f80;
+            border: 1px solid #f80;
+        }
+
+        .button-pause:hover {
+            background: #f80;
+            color: #000;
+        }
+
+        .button-stop {
+            background: transparent;
+            color: #f00;
+            border: 1px solid #f00;
+        }
+
+        .button-stop:hover {
+            background: #f00;
+            color: #000;
+        }
+
+        .button-small {
+            padding: 6px 12px;
+            font-size: 9px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+            font-weight: normal;
+            color: #666;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #222;
+        }
+
+        tr:hover {
+            background: #111;
+        }
+
+        .allocation-bar {
+            display: flex;
+            height: 3px;
+            background: #111;
+            margin-top: 10px;
+        }
+
+        .allocation-segment {
+            height: 100%;
+        }
+
+        .sensitivity-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+        }
+
+        .sensitivity-label {
+            font-size: 9px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .pause-info {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 11px;
+            display: none;
+        }
+
+        .pause-info.active {
+            display: block;
+        }
+
+        .pause-info-title {
+            color: #f80;
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .signal-estimator {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .estimator-header {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .estimator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .estimator-item {
+            text-align: center;
+            padding: 15px;
+            border: 1px solid #222;
+        }
+
+        .estimator-label {
+            font-size: 9px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .estimator-value {
+            font-size: 20px;
+            color: #0f0;
+        }
+
+        .estimator-range {
+            font-size: 9px;
+            color: #444;
+            margin-top: 5px;
+        }
+
+        .estimator-total {
+            background: #111;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .estimator-total-value {
+            font-size: 28px;
+            color: #0f0;
+            margin-bottom: 5px;
+        }
+
+        .estimator-total-label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            animation: fadeIn 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #000;
+            border: 1px solid #0f0;
+            padding: 30px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            letter-spacing: 2px;
+            color: #0f0;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: 1px solid #666;
+            color: #666;
+            font-size: 20px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .modal-close:hover {
+            border-color: #f00;
+            color: #f00;
+        }
+
+        .modal-body {
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            font-size: 11px;
+            color: #0f0;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .modal-text {
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .modal-list {
+            list-style: none;
+            padding-left: 15px;
+        }
+
+        .modal-list li {
+            color: #999;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .modal-list li:before {
+            content: "▸";
+            color: #0f0;
+            position: absolute;
+            left: -15px;
+        }
+
+        .modal-highlight {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .modal-table td {
+            padding: 8px;
+            border: 1px solid #333;
+            font-size: 11px;
+        }
+
+        .modal-table td:first-child {
+            color: #0f0;
+            width: 40%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <img src="/logo.png" alt="LCTB" style="height: 32px;">
+            </div>
+            <div class="header-right">
+                <div class="bot-status">
+                    <div class="status-indicator" id="statusIndicator"></div>
+                    <div>
+                        <div class="header-label">STATUS</div>
+                        <div class="header-value" id="botStatus">RUNNING</div>
+                    </div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">LAST SCAN</div>
+                    <div class="header-value" id="lastScan">--:--:--</div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">NEXT IN</div>
+                    <div class="header-value" id="nextScan">--</div>
+                </div>
+                <div class="header-item">
+                    <div class="header-label">API CALLS</div>
+                    <div class="header-value" id="apiCalls">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Info -->
+        <div class="pause-info" id="pauseInfo">
+            <div class="pause-info-title">⏸ BOT PAUSED - WAITING FOR POSITIONS TO CLOSE</div>
+            <div>Open positions: <span id="pausePositions">0</span> | No new trades will be opened</div>
+        </div>
+
+        <!-- Bot Controls -->
+        <div class="section">
+            <div class="section-header">
+                <span>BOT CONTROLS</span>
+                <div class="bot-controls">
+                    <button class="button-outline button button-small" id="btnResume">▶ RESUME</button>
+                    <button class="button-pause button button-small" id="btnPause">⏸ PAUSE AFTER CLOSE</button>
+                    <button class="button-stop button button-small" id="btnStop">⏹ STOP NOW</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid">
+            <div class="metric-box">
+                <div class="metric-label">BALANCE</div>
+                <div class="metric-value" id="balance">$1,000.00</div>
+                <div class="metric-sub" id="startedBalance">STARTED: --</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">TOTAL PNL</div>
+                <div class="metric-value positive" id="totalPnl">+$0.00</div>
+                <div class="metric-sub positive" id="totalPnlPct">+0.0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">TODAY PNL</div>
+                <div class="metric-value positive" id="todayPnl">+$0.00</div>
+                <div class="metric-sub positive" id="todayPnlPct">+0.0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">WIN RATE</div>
+                <div class="metric-value" id="winRate">0%</div>
+                <div class="metric-sub" id="winLoss">0W / 0L</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">POSITIONS</div>
+                <div class="metric-value" id="openPositions">0</div>
+                <div class="metric-sub">MAX: 5</div>
+            </div>
+        </div>
+
+        <!-- Strategy Controls -->
+        <div class="section">
+            <div class="section-header">STRATEGY CONTROLS</div>
+            <div class="section-content">
+                <div class="strategy-grid">
+                    <!-- Momentum Strategy -->
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <div class="strategy-name" onclick="openModal('momentum')">
+                                <span>MOMENTUM</span>
+                                <span class="info-icon">i</span>
+                            </div>
+                            <div class="strategy-status" id="momentum-status">ACTIVE</div>
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>ALLOCATION</span>
+                                <span id="momentum-allocation">40%</span>
+                            </div>
+                            <input type="range" class="slider" id="momentum-alloc-slider" min="0" max="100" value="40">
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>LEVERAGE</span>
+                                <span id="momentum-leverage">5x</span>
+                            </div>
+                            <input type="range" class="slider" id="momentum-lev-slider" min="1" max="10" value="5">
+                        </div>
+                        <div class="sensitivity-controls">
+                            <div class="sensitivity-label">SENSITIVITY</div>
+                            <div class="control-label">
+                                <span>SOCIAL VOL</span>
+                                <span id="momentum-social">25%</span>
+                            </div>
+                            <input type="range" class="slider" id="momentum-social-slider" min="15" max="50" value="25">
+                            <div class="control-label" style="margin-top: 10px;">
+                                <span>SENTIMENT</span>
+                                <span id="momentum-sentiment">52</span>
+                            </div>
+                            <input type="range" class="slider" id="momentum-sentiment-slider" min="45" max="65" value="52">
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">PNL</div>
+                                <div class="positive" id="momentum-pnl">+$0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">TRADES</div>
+                                <div id="momentum-trades">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AltRank Strategy -->
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <div class="strategy-name" onclick="openModal('altrank')">
+                                <span>ALTRANK</span>
+                                <span class="info-icon">i</span>
+                            </div>
+                            <div class="strategy-status" id="altrank-status">ACTIVE</div>
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>ALLOCATION</span>
+                                <span id="altrank-allocation">30%</span>
+                            </div>
+                            <input type="range" class="slider" id="altrank-alloc-slider" min="0" max="100" value="30">
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>LEVERAGE</span>
+                                <span id="altrank-leverage">4x</span>
+                            </div>
+                            <input type="range" class="slider" id="altrank-lev-slider" min="1" max="10" value="4">
+                        </div>
+                        <div class="sensitivity-controls">
+                            <div class="sensitivity-label">SENSITIVITY</div>
+                            <div class="control-label">
+                                <span>RANK IMPROVE</span>
+                                <span id="altrank-improve">10</span>
+                            </div>
+                            <input type="range" class="slider" id="altrank-improve-slider" min="5" max="20" value="10">
+                            <div class="control-label" style="margin-top: 10px;">
+                                <span>TOP COINS</span>
+                                <span id="altrank-top">150</span>
+                            </div>
+                            <input type="range" class="slider" id="altrank-top-slider" min="80" max="200" value="150">
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">PNL</div>
+                                <div class="negative" id="altrank-pnl">$0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">TRADES</div>
+                                <div id="altrank-trades">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reversal Strategy -->
+                    <div class="strategy-card">
+                        <div class="strategy-header">
+                            <div class="strategy-name" onclick="openModal('reversal')">
+                                <span>REVERSAL</span>
+                                <span class="info-icon">i</span>
+                            </div>
+                            <div class="strategy-status" id="reversal-status">ACTIVE</div>
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>ALLOCATION</span>
+                                <span id="reversal-allocation">20%</span>
+                            </div>
+                            <input type="range" class="slider" id="reversal-alloc-slider" min="0" max="100" value="20">
+                        </div>
+                        <div class="control-row">
+                            <div class="control-label">
+                                <span>LEVERAGE</span>
+                                <span id="reversal-leverage">3x</span>
+                            </div>
+                            <input type="range" class="slider" id="reversal-lev-slider" min="1" max="10" value="3">
+                        </div>
+                        <div class="sensitivity-controls">
+                            <div class="sensitivity-label">SENSITIVITY</div>
+                            <div class="control-label">
+                                <span>PRICE DROP</span>
+                                <span id="reversal-drop">-3%</span>
+                            </div>
+                            <input type="range" class="slider" id="reversal-drop-slider" min="2" max="8" value="3">
+                            <div class="control-label" style="margin-top: 10px;">
+                                <span>GALAXY SCORE</span>
+                                <span id="reversal-galaxy">65</span>
+                            </div>
+                            <input type="range" class="slider" id="reversal-galaxy-slider" min="55" max="75" value="65">
+                        </div>
+                        <div class="strategy-stats">
+                            <div class="stat-item">
+                                <div class="stat-label">PNL</div>
+                                <div class="positive" id="reversal-pnl">+$0</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">TRADES</div>
+                                <div id="reversal-trades">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Signal Estimator -->
+                <div class="signal-estimator">
+                    <div class="estimator-header">ESTIMATED DAILY SIGNALS (BASED ON CURRENT SETTINGS)</div>
+                    <div class="estimator-grid">
+                        <div class="estimator-item">
+                            <div class="estimator-label">MOMENTUM</div>
+                            <div class="estimator-value" id="est-momentum">8-12</div>
+                            <div class="estimator-range">signals/day</div>
+                        </div>
+                        <div class="estimator-item">
+                            <div class="estimator-label">ALTRANK</div>
+                            <div class="estimator-value" id="est-altrank">3-6</div>
+                            <div class="estimator-range">signals/day</div>
+                        </div>
+                        <div class="estimator-item">
+                            <div class="estimator-label">REVERSAL</div>
+                            <div class="estimator-value" id="est-reversal">2-4</div>
+                            <div class="estimator-range">signals/day</div>
+                        </div>
+                        <div class="estimator-total">
+                            <div class="estimator-total-value" id="est-total">13-22</div>
+                            <div class="estimator-total-label">TOTAL/DAY</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #222;">
+                    <div style="font-size: 10px; color: #666; margin-bottom: 10px;">
+                        TOTAL ALLOCATION: <span id="total-allocation">90%</span>
+                    </div>
+                    <div class="allocation-bar">
+                        <div class="allocation-segment" id="alloc-bar-1" style="background: #fff; width: 40%;"></div>
+                        <div class="allocation-segment" id="alloc-bar-2" style="background: #888; width: 30%;"></div>
+                        <div class="allocation-segment" id="alloc-bar-3" style="background: #444; width: 20%;"></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="button-outline button" id="btnReset">RESET TO DEFAULT</button>
+                    <button class="button" id="btnApply">APPLY CHANGES</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade History -->
+        <div class="section">
+            <div class="section-header">TRADE HISTORY</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TIME</th>
+                            <th>STRATEGY</th>
+                            <th>ASSET</th>
+                            <th>SIDE</th>
+                            <th>SIZE</th>
+                            <th>ENTRY</th>
+                            <th>EXIT</th>
+                            <th>PNL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradeHistory">
+                        <tr>
+                            <td colspan="8" style="text-align: center; color: #333; padding: 40px;">NO TRADES YET</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Export Actions -->
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="button-outline button">EXPORT CSV</button>
+            <button class="button-outline button">DAILY REPORT</button>
+        </div>
+    </div>
+
+    <!-- Strategy Modals -->
+    <div id="momentumModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">MOMENTUM STRATEGY</div>
+                <button class="modal-close" onclick="closeModal('momentum')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">OVERVIEW</div>
+                    <p class="modal-text">
+                        The Momentum Strategy capitalizes on <span class="modal-highlight">social media momentum</span> combined with positive sentiment to identify cryptocurrencies experiencing rapid increases in attention and interest. This strategy follows the principle that coins gaining significant social traction often experience corresponding price movements.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">HOW IT WORKS</div>
+                    <p class="modal-text">
+                        The strategy continuously monitors LunarCrush's social metrics and executes trades when specific conditions are met:
+                    </p>
+                    <ul class="modal-list">
+                        <li><strong>Social Volume Spike:</strong> Detects when a coin's social mentions increase by at least 25% (adjustable) compared to its recent baseline</li>
+                        <li><strong>Positive Sentiment:</strong> Confirms that the sentiment score is above 52 (adjustable), indicating bullish community perception</li>
+                        <li><strong>Price Correlation:</strong> Verifies that social momentum is translating into price action</li>
+                        <li><strong>Entry Timing:</strong> Opens long positions when both conditions align</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">KEY PARAMETERS</div>
+                    <table class="modal-table">
+                        <tr>
+                            <td>Social Volume Min</td>
+                            <td>Minimum % increase in social mentions required (default: 25%)</td>
+                        </tr>
+                        <tr>
+                            <td>Sentiment Min</td>
+                            <td>Minimum sentiment score required (default: 52 out of 100)</td>
+                        </tr>
+                        <tr>
+                            <td>Leverage</td>
+                            <td>Position multiplier (default: 5x)</td>
+                        </tr>
+                        <tr>
+                            <td>Stop Loss</td>
+                            <td>Maximum loss per trade: -2.5%</td>
+                        </tr>
+                        <tr>
+                            <td>Take Profit</td>
+                            <td>Target gain per trade: +8%</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">RISK MANAGEMENT</div>
+                    <ul class="modal-list">
+                        <li><strong>Position Sizing:</strong> Uses 40% of total capital allocation</li>
+                        <li><strong>Tight Stops:</strong> 2.5% stop loss to limit downside on false signals</li>
+                        <li><strong>Quick Exits:</strong> Designed for fast-moving trades (2-8 hour duration)</li>
+                        <li><strong>High Frequency:</strong> Generates 8-12 signals per day with current settings</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">BEST USE CASES</div>
+                    <ul class="modal-list">
+                        <li>Bull markets with high retail participation</li>
+                        <li>News-driven events (partnerships, launches, listings)</li>
+                        <li>Trending topics on crypto social media</li>
+                        <li>Meme coin pumps and viral narratives</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">ADJUSTING SENSITIVITY</div>
+                    <p class="modal-text">
+                        <strong>Lower sensitivity (15-20% social volume):</strong> Generates more signals but includes weaker momentum plays. Use in quiet markets.<br><br>
+                        <strong>Higher sensitivity (35-50% social volume):</strong> Generates fewer but higher-quality signals. Use in volatile markets to avoid false breakouts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="altrankModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">ALTRANK STRATEGY</div>
+                <button class="modal-close" onclick="closeModal('altrank')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">OVERVIEW</div>
+                    <p class="modal-text">
+                        The AltRank Strategy identifies cryptocurrencies experiencing <span class="modal-highlight">significant improvements in their AltRank™ score</span>. AltRank is LunarCrush's proprietary metric that ranks coins based on a combination of social activity, market performance, and overall market influence. Rising AltRank often precedes price appreciation.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">HOW IT WORKS</div>
+                    <p class="modal-text">
+                        This strategy monitors rank changes across the cryptocurrency universe and takes positions when coins show strong upward rank momentum:
+                    </p>
+                    <ul class="modal-list">
+                        <li><strong>Rank Tracking:</strong> Monitors AltRank position for top 150 coins (adjustable)</li>
+                        <li><strong>Improvement Detection:</strong> Identifies coins that have improved their rank by at least 10 positions (adjustable) in recent period</li>
+                        <li><strong>Quality Filter:</strong> Ensures the coin is within top 150 to avoid low-liquidity assets</li>
+                        <li><strong>Breakout Confirmation:</strong> Verifies that rank improvement is sustained, not a temporary spike</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">KEY PARAMETERS</div>
+                    <table class="modal-table">
+                        <tr>
+                            <td>Rank Improve Min</td>
+                            <td>Minimum rank positions gained required (default: 10)</td>
+                        </tr>
+                        <tr>
+                            <td>Top Coins</td>
+                            <td>Maximum rank to consider (default: 150)</td>
+                        </tr>
+                        <tr>
+                            <td>Leverage</td>
+                            <td>Position multiplier (default: 4x)</td>
+                        </tr>
+                        <tr>
+                            <td>Stop Loss</td>
+                            <td>Maximum loss per trade: -3%</td>
+                        </tr>
+                        <tr>
+                            <td>Take Profit</td>
+                            <td>Target gain per trade: +10%</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">RISK MANAGEMENT</div>
+                    <ul class="modal-list">
+                        <li><strong>Position Sizing:</strong> Uses 30% of total capital allocation</li>
+                        <li><strong>Moderate Stops:</strong> 3% stop loss allows for normal volatility</li>
+                        <li><strong>Medium Duration:</strong> Trades typically last 4-12 hours</li>
+                        <li><strong>Selective Entry:</strong> Generates 3-6 signals per day with current settings</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">WHAT IS ALTRANK?</div>
+                    <p class="modal-text">
+                        AltRank™ is a composite score that considers:
+                    </p>
+                    <ul class="modal-list">
+                        <li><strong>Social Volume:</strong> Total mentions across social platforms</li>
+                        <li><strong>Social Engagement:</strong> Likes, shares, comments on social posts</li>
+                        <li><strong>Social Sentiment:</strong> Overall positive/negative perception</li>
+                        <li><strong>Market Cap:</strong> Relative size and liquidity</li>
+                        <li><strong>Price Performance:</strong> Recent price momentum</li>
+                    </ul>
+                    <p class="modal-text" style="margin-top: 10px;">
+                        A coin improving from rank #80 to #70 indicates growing market influence and attention, which often precedes price increases.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">BEST USE CASES</div>
+                    <ul class="modal-list">
+                        <li>Identifying emerging narratives before they go mainstream</li>
+                        <li>Catching altcoins rotating into favor</li>
+                        <li>Trading sector rotations (DeFi, Gaming, AI, etc.)</li>
+                        <li>Finding coins with improving fundamentals</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">ADJUSTING SENSITIVITY</div>
+                    <p class="modal-text">
+                        <strong>Lower sensitivity (5-8 rank improvement, 180-200 top coins):</strong> Casts a wider net, includes smaller rank jumps and lower-ranked coins. More signals but lower quality.<br><br>
+                        <strong>Higher sensitivity (15-20 rank improvement, 80-100 top coins):</strong> Only trades significant rank breakouts in top-tier coins. Fewer but higher-conviction signals.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reversalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">REVERSAL STRATEGY</div>
+                <button class="modal-close" onclick="closeModal('reversal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">OVERVIEW</div>
+                    <p class="modal-text">
+                        The Reversal Strategy is a <span class="modal-highlight">contrarian approach</span> that identifies high-quality cryptocurrencies experiencing temporary price dips. It buys the dip when strong social fundamentals suggest the decline is an overreaction rather than a fundamental breakdown. This "buy low" strategy targets mean reversion in quality assets.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">HOW IT WORKS</div>
+                    <p class="modal-text">
+                        The strategy waits for short-term price weakness in fundamentally strong coins, then enters positions expecting a bounce:
+                    </p>
+                    <ul class="modal-list">
+                        <li><strong>Price Drop Detection:</strong> Identifies coins that have dropped at least 3% (adjustable) in recent period</li>
+                        <li><strong>Quality Filter:</strong> Requires Galaxy Score above 65 (adjustable) to ensure social fundamentals remain strong</li>
+                        <li><strong>Divergence Check:</strong> Confirms that social metrics (volume, engagement) haven't collapsed with price</li>
+                        <li><strong>Entry Timing:</strong> Opens long positions when price is down but social strength persists</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">KEY PARAMETERS</div>
+                    <table class="modal-table">
+                        <tr>
+                            <td>Price Drop Min</td>
+                            <td>Minimum % price decline required (default: -3%)</td>
+                        </tr>
+                        <tr>
+                            <td>Galaxy Score Min</td>
+                            <td>Minimum quality score required (default: 65 out of 100)</td>
+                        </tr>
+                        <tr>
+                            <td>Leverage</td>
+                            <td>Position multiplier (default: 3x)</td>
+                        </tr>
+                        <tr>
+                            <td>Stop Loss</td>
+                            <td>Maximum loss per trade: -4%</td>
+                        </tr>
+                        <tr>
+                            <td>Take Profit</td>
+                            <td>Target gain per trade: +12%</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">RISK MANAGEMENT</div>
+                    <ul class="modal-list">
+                        <li><strong>Position Sizing:</strong> Uses 20% of total capital allocation</li>
+                        <li><strong>Wider Stops:</strong> 4% stop loss accommodates volatility during reversals</li>
+                        <li><strong>Longer Duration:</strong> Trades may take 6-24 hours to reach targets</li>
+                        <li><strong>Conservative Frequency:</strong> Generates 2-4 signals per day with current settings</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">WHAT IS GALAXY SCORE?</div>
+                    <p class="modal-text">
+                        Galaxy Score™ is LunarCrush's overall quality metric that combines:
+                    </p>
+                    <ul class="modal-list">
+                        <li><strong>Social Strength:</strong> Consistency and growth of social presence</li>
+                        <li><strong>Community Health:</strong> Engagement quality and sentiment trends</li>
+                        <li><strong>Market Position:</strong> Liquidity, volume, and market cap stability</li>
+                        <li><strong>Price Stability:</strong> Historical volatility and drawdown patterns</li>
+                    </ul>
+                    <p class="modal-text" style="margin-top: 10px;">
+                        A high Galaxy Score (65+) indicates a coin with strong fundamentals that is likely to recover from temporary price weakness.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">BEST USE CASES</div>
+                    <ul class="modal-list">
+                        <li>Market-wide corrections affecting quality assets</li>
+                        <li>Temporary FUD (Fear, Uncertainty, Doubt) events</li>
+                        <li>Stop-loss cascades creating oversold conditions</li>
+                        <li>End-of-day profit-taking in strong coins</li>
+                    </ul>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">STRATEGY PHILOSOPHY</div>
+                    <p class="modal-text">
+                        Unlike momentum strategies that "buy high and sell higher," this strategy "buys low and sells normal." It exploits the market's tendency to overreact to short-term price movements while ignoring strong underlying fundamentals. The key insight: if social metrics remain strong during a price dip, the dip is likely temporary.
+                    </p>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">ADJUSTING SENSITIVITY</div>
+                    <p class="modal-text">
+                        <strong>Lower sensitivity (-2% drop, 55-60 galaxy score):</strong> Buys smaller dips in a wider range of coins. More signals but includes weaker reversals.<br><br>
+                        <strong>Higher sensitivity (-6% to -8% drop, 70-75 galaxy score):</strong> Only buys significant dips in the highest-quality coins. Fewer signals but stronger conviction.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="passwordModal" class="modal" style="z-index: 10000;">
+        <div class="modal-content" style="max-width: 350px;">
+            <div class="modal-header">
+                <div class="modal-title">ADMIN ACCESS</div>
+                <button class="modal-close" onclick="hidePasswordModal()">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <p style="color: #888; margin-bottom: 15px; font-size: 11px;">Enter password to modify bot settings</p>
+                <input type="password" id="adminPassword" placeholder="PASSWORD" style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: #fff; font-family: 'Courier New', monospace; font-size: 14px; letter-spacing: 2px;">
+                <div id="passwordError" style="color: #f00; font-size: 11px; margin-top: 10px; display: none;"></div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 0 20px 20px;">
+                <button class="button-outline button" onclick="hidePasswordModal()">CANCEL</button>
+                <button class="button" id="btnSubmitPassword">AUTHENTICATE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password management
+        let storedPassword = sessionStorage.getItem('adminPassword') || '';
+        let pendingAction = null;
+
+        function showPasswordModal(action) {
+            pendingAction = action;
+            document.getElementById('passwordModal').classList.add('active');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('passwordError').style.display = 'none';
+            document.getElementById('adminPassword').focus();
+        }
+
+        function hidePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+            pendingAction = null;
+        }
+
+        document.getElementById('adminPassword').onkeypress = function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnSubmitPassword').click();
+            }
+        };
+
+        document.getElementById('btnSubmitPassword').onclick = async function() {
+            const password = document.getElementById('adminPassword').value;
+            if (!password) {
+                document.getElementById('passwordError').textContent = 'PASSWORD REQUIRED';
+                document.getElementById('passwordError').style.display = 'block';
+                return;
+            }
+            
+            storedPassword = password;
+            sessionStorage.setItem('adminPassword', password);
+            hidePasswordModal();
+            
+            if (pendingAction) {
+                await pendingAction();
+            }
+        };
+
+        async function authenticatedRequest(url, options = {}) {
+            const headers = { ...options.headers, 'X-Admin-Password': storedPassword };
+            const response = await fetch(url, { ...options, headers });
+            
+            if (response.status === 401) {
+                try {
+                    const data = await response.json();
+                    if (data.auth_required) {
+                        return new Promise((resolve) => {
+                            showPasswordModal(async () => {
+                                const retryResponse = await authenticatedRequest(url, options);
+                                resolve(retryResponse);
+                            });
+                        });
+                    }
+                } catch (e) {
+                    return new Promise((resolve) => {
+                        showPasswordModal(async () => {
+                            const retryResponse = await authenticatedRequest(url, options);
+                            resolve(retryResponse);
+                        });
+                    });
+                }
+            }
+            return response;
+        }
+
+        // Modal functions
+        function openModal(strategy) {
+            const modal = document.getElementById(strategy + 'Modal');
+            modal.classList.add('active');
+        }
+
+        function closeModal(strategy) {
+            const modal = document.getElementById(strategy + 'Modal');
+            modal.classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Signal estimation logic
+        function estimateSignals() {
+            const socialVol = parseInt(document.getElementById('momentum-social-slider').value);
+            const sentiment = parseInt(document.getElementById('momentum-sentiment-slider').value);
+            let momentumMin, momentumMax;
+            
+            if (socialVol <= 20 && sentiment <= 50) {
+                momentumMin = 12; momentumMax = 18;
+            } else if (socialVol <= 30 && sentiment <= 55) {
+                momentumMin = 8; momentumMax = 12;
+            } else if (socialVol <= 40 && sentiment <= 60) {
+                momentumMin = 4; momentumMax = 8;
+            } else {
+                momentumMin = 2; momentumMax = 4;
+            }
+            
+            const rankImprove = parseInt(document.getElementById('altrank-improve-slider').value);
+            const topCoins = parseInt(document.getElementById('altrank-top-slider').value);
+            let altrankMin, altrankMax;
+            
+            if (rankImprove <= 8 && topCoins >= 160) {
+                altrankMin = 6; altrankMax = 10;
+            } else if (rankImprove <= 12 && topCoins >= 130) {
+                altrankMin = 3; altrankMax = 6;
+            } else if (rankImprove <= 16 && topCoins >= 100) {
+                altrankMin = 2; altrankMax = 4;
+            } else {
+                altrankMin = 1; altrankMax = 2;
+            }
+            
+            const priceDrop = parseInt(document.getElementById('reversal-drop-slider').value);
+            const galaxyScore = parseInt(document.getElementById('reversal-galaxy-slider').value);
+            let reversalMin, reversalMax;
+            
+            if (priceDrop <= 3 && galaxyScore <= 60) {
+                reversalMin = 4; reversalMax = 7;
+            } else if (priceDrop <= 5 && galaxyScore <= 68) {
+                reversalMin = 2; reversalMax = 4;
+            } else if (priceDrop <= 6 && galaxyScore <= 72) {
+                reversalMin = 1; reversalMax = 3;
+            } else {
+                reversalMin = 0; reversalMax = 2;
+            }
+            
+            const momentumAlloc = parseInt(document.getElementById('momentum-alloc-slider').value);
+            const altrankAlloc = parseInt(document.getElementById('altrank-alloc-slider').value);
+            const reversalAlloc = parseInt(document.getElementById('reversal-alloc-slider').value);
+            
+            if (momentumAlloc === 0) { momentumMin = 0; momentumMax = 0; }
+            if (altrankAlloc === 0) { altrankMin = 0; altrankMax = 0; }
+            if (reversalAlloc === 0) { reversalMin = 0; reversalMax = 0; }
+            
+            document.getElementById('est-momentum').textContent = momentumMin + '-' + momentumMax;
+            document.getElementById('est-altrank').textContent = altrankMin + '-' + altrankMax;
+            document.getElementById('est-reversal').textContent = reversalMin + '-' + reversalMax;
+            document.getElementById('est-total').textContent = 
+                (momentumMin + altrankMin + reversalMin) + '-' + (momentumMax + altrankMax + reversalMax);
+        }
+
+        // Slider updates
+        document.getElementById('momentum-alloc-slider').oninput = function() {
+            document.getElementById('momentum-allocation').textContent = this.value + '%';
+            updateAllocationBar();
+            estimateSignals();
+        };
+        document.getElementById('momentum-lev-slider').oninput = function() {
+            document.getElementById('momentum-leverage').textContent = this.value + 'x';
+        };
+        document.getElementById('momentum-social-slider').oninput = function() {
+            document.getElementById('momentum-social').textContent = this.value + '%';
+            estimateSignals();
+        };
+        document.getElementById('momentum-sentiment-slider').oninput = function() {
+            document.getElementById('momentum-sentiment').textContent = this.value;
+            estimateSignals();
+        };
+
+        document.getElementById('altrank-alloc-slider').oninput = function() {
+            document.getElementById('altrank-allocation').textContent = this.value + '%';
+            updateAllocationBar();
+            estimateSignals();
+        };
+        document.getElementById('altrank-lev-slider').oninput = function() {
+            document.getElementById('altrank-leverage').textContent = this.value + 'x';
+        };
+        document.getElementById('altrank-improve-slider').oninput = function() {
+            document.getElementById('altrank-improve').textContent = this.value;
+            estimateSignals();
+        };
+        document.getElementById('altrank-top-slider').oninput = function() {
+            document.getElementById('altrank-top').textContent = this.value;
+            estimateSignals();
+        };
+
+        document.getElementById('reversal-alloc-slider').oninput = function() {
+            document.getElementById('reversal-allocation').textContent = this.value + '%';
+            updateAllocationBar();
+            estimateSignals();
+        };
+        document.getElementById('reversal-lev-slider').oninput = function() {
+            document.getElementById('reversal-leverage').textContent = this.value + 'x';
+        };
+        document.getElementById('reversal-drop-slider').oninput = function() {
+            document.getElementById('reversal-drop').textContent = '-' + this.value + '%';
+            estimateSignals();
+        };
+        document.getElementById('reversal-galaxy-slider').oninput = function() {
+            document.getElementById('reversal-galaxy').textContent = this.value;
+            estimateSignals();
+        };
+
+        function updateAllocationBar() {
+            const m = parseInt(document.getElementById('momentum-alloc-slider').value);
+            const a = parseInt(document.getElementById('altrank-alloc-slider').value);
+            const r = parseInt(document.getElementById('reversal-alloc-slider').value);
+            const total = m + a + r;
+            
+            document.getElementById('total-allocation').textContent = total + '%';
+            document.getElementById('alloc-bar-1').style.width = m + '%';
+            document.getElementById('alloc-bar-2').style.width = a + '%';
+            document.getElementById('alloc-bar-3').style.width = r + '%';
+        }
+
+        // Bot control buttons (password protected)
+        document.getElementById('btnPause').onclick = async function() {
+            const response = await authenticatedRequest('/api/bot/pause', { method: 'POST' });
+            if (response.ok) {
+                document.getElementById('pauseInfo').classList.add('active');
+                document.getElementById('statusIndicator').classList.add('paused');
+                document.getElementById('botStatus').textContent = 'PAUSING';
+            }
+        };
+
+        document.getElementById('btnResume').onclick = async function() {
+            const response = await authenticatedRequest('/api/bot/resume', { method: 'POST' });
+            if (response.ok) {
+                document.getElementById('pauseInfo').classList.remove('active');
+                document.getElementById('statusIndicator').classList.remove('paused');
+                document.getElementById('botStatus').textContent = 'RUNNING';
+            }
+        };
+
+        document.getElementById('btnStop').onclick = async function() {
+            if (confirm('Stop bot immediately and close all positions?')) {
+                try {
+                    const response = await authenticatedRequest('/api/bot/stop', { method: 'POST' });
+                    if (response.ok) {
+                        document.getElementById('statusIndicator').classList.add('stopped');
+                        document.getElementById('botStatus').textContent = 'STOPPED';
+                        alert('Bot stopped successfully!');
+                    } else {
+                        const data = await response.json().catch(() => ({}));
+                        alert('Error: ' + (data.error || 'Failed to stop bot. Status: ' + response.status));
+                    }
+                } catch (e) {
+                    alert('Error stopping bot: ' + e.message);
+                }
+            }
+        };
+
+        document.getElementById('btnReset').onclick = function() {
+            document.getElementById('momentum-alloc-slider').value = 40;
+            document.getElementById('momentum-lev-slider').value = 5;
+            document.getElementById('momentum-social-slider').value = 25;
+            document.getElementById('momentum-sentiment-slider').value = 52;
+            
+            document.getElementById('altrank-alloc-slider').value = 30;
+            document.getElementById('altrank-lev-slider').value = 4;
+            document.getElementById('altrank-improve-slider').value = 10;
+            document.getElementById('altrank-top-slider').value = 150;
+            
+            document.getElementById('reversal-alloc-slider').value = 20;
+            document.getElementById('reversal-lev-slider').value = 3;
+            document.getElementById('reversal-drop-slider').value = 3;
+            document.getElementById('reversal-galaxy-slider').value = 65;
+            
+            document.getElementById('momentum-alloc-slider').oninput();
+            document.getElementById('momentum-lev-slider').oninput();
+            document.getElementById('momentum-social-slider').oninput();
+            document.getElementById('momentum-sentiment-slider').oninput();
+            document.getElementById('altrank-alloc-slider').oninput();
+            document.getElementById('altrank-lev-slider').oninput();
+            document.getElementById('altrank-improve-slider').oninput();
+            document.getElementById('altrank-top-slider').oninput();
+            document.getElementById('reversal-alloc-slider').oninput();
+            document.getElementById('reversal-lev-slider').oninput();
+            document.getElementById('reversal-drop-slider').oninput();
+            document.getElementById('reversal-galaxy-slider').oninput();
+        };
+
+        document.getElementById('btnApply').onclick = async function() {
+            const config = {
+                momentum: {
+                    allocation: parseInt(document.getElementById('momentum-alloc-slider').value),
+                    leverage: parseInt(document.getElementById('momentum-lev-slider').value),
+                    social_volume_min: parseInt(document.getElementById('momentum-social-slider').value) / 100,
+                    sentiment_min: parseInt(document.getElementById('momentum-sentiment-slider').value)
+                },
+                altrank: {
+                    allocation: parseInt(document.getElementById('altrank-alloc-slider').value),
+                    leverage: parseInt(document.getElementById('altrank-lev-slider').value),
+                    rank_improve_min: parseInt(document.getElementById('altrank-improve-slider').value),
+                    top_coins: parseInt(document.getElementById('altrank-top-slider').value)
+                },
+                reversal: {
+                    allocation: parseInt(document.getElementById('reversal-alloc-slider').value),
+                    leverage: parseInt(document.getElementById('reversal-lev-slider').value),
+                    price_drop_min: parseInt(document.getElementById('reversal-drop-slider').value),
+                    galaxy_score_min: parseInt(document.getElementById('reversal-galaxy-slider').value)
+                }
+            };
+
+            const response = await authenticatedRequest('/api/config/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(config)
+            });
+
+            if (response.ok) {
+                alert('Configuration updated successfully');
+            }
+        };
+
+        // Countdown timer state
+        let nextScanSeconds = 0;
+        
+        function updateCountdown() {
+            if (nextScanSeconds > 0) {
+                nextScanSeconds--;
+                const mins = Math.floor(nextScanSeconds / 60);
+                const secs = nextScanSeconds % 60;
+                document.getElementById('nextScan').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Update dashboard
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                document.getElementById('balance').textContent = '$' + data.balance.toFixed(2);
+                if (data.starting_balance) {
+                    document.getElementById('startedBalance').textContent = 'STARTED: $' + data.starting_balance.toFixed(2);
+                }
+                document.getElementById('totalPnl').textContent = (data.total_pnl >= 0 ? '+' : '') + '$' + data.total_pnl.toFixed(2);
+                document.getElementById('totalPnlPct').textContent = (data.total_pnl_pct >= 0 ? '+' : '') + data.total_pnl_pct.toFixed(1) + '%';
+                document.getElementById('totalPnlPct').className = 'metric-sub ' + (data.total_pnl_pct >= 0 ? 'positive' : 'negative');
+                
+                if (data.today_pnl !== undefined) {
+                    document.getElementById('todayPnl').textContent = (data.today_pnl >= 0 ? '+' : '') + '$' + data.today_pnl.toFixed(2);
+                    document.getElementById('todayPnlPct').textContent = (data.today_pnl_pct >= 0 ? '+' : '') + data.today_pnl_pct.toFixed(1) + '%';
+                    document.getElementById('todayPnlPct').className = 'metric-sub ' + (data.today_pnl_pct >= 0 ? 'positive' : 'negative');
+                    document.getElementById('todayPnl').className = 'metric-value ' + (data.today_pnl >= 0 ? 'positive' : 'negative');
+                }
+                document.getElementById('totalPnl').className = 'metric-value ' + (data.total_pnl >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('openPositions').textContent = data.open_positions;
+                document.getElementById('pausePositions').textContent = data.open_positions;
+                
+                // Update scan timing
+                if (data.last_scan) {
+                    document.getElementById('lastScan').textContent = data.last_scan;
+                }
+                if (data.next_scan && data.next_scan !== '--') {
+                    const parts = data.next_scan.split(':');
+                    nextScanSeconds = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+                    document.getElementById('nextScan').textContent = data.next_scan;
+                }
+                if (data.api_calls !== undefined) {
+                    document.getElementById('apiCalls').textContent = data.api_calls;
+                }
+                
+                if (data.bot_status === 'stopped') {
+                    document.getElementById('botStatus').textContent = 'STOPPED';
+                    document.getElementById('statusIndicator').classList.add('stopped');
+                    document.getElementById('statusIndicator').classList.remove('paused');
+                } else if (data.bot_status === 'paused' && data.open_positions === 0) {
+                    document.getElementById('botStatus').textContent = 'PAUSED';
+                    document.getElementById('statusIndicator').classList.add('paused');
+                    document.getElementById('pauseInfo').classList.remove('active');
+                } else if (data.bot_status === 'running') {
+                    document.getElementById('botStatus').textContent = 'RUNNING';
+                    document.getElementById('statusIndicator').classList.remove('stopped');
+                    document.getElementById('statusIndicator').classList.remove('paused');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Load trade history from Hyperliquid
+        async function loadTradeHistory() {
+            try {
+                const response = await fetch('/api/transactions');
+                const trades = await response.json();
+                
+                const tbody = document.getElementById('tradeHistory');
+                if (!trades || trades.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #333; padding: 40px;">NO TRADES YET</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = trades.map(t => {
+                    const pnlClass = t.pnl >= 0 ? 'positive' : 'negative';
+                    const pnlSign = t.pnl >= 0 ? '+' : '';
+                    return `<tr>
+                        <td>${t.time}</td>
+                        <td>--</td>
+                        <td>${t.symbol}</td>
+                        <td>${t.side}</td>
+                        <td>${t.size.toFixed(4)}</td>
+                        <td>$${t.price.toFixed(4)}</td>
+                        <td>$${t.value.toFixed(2)}</td>
+                        <td class="${pnlClass}">${pnlSign}$${t.pnl.toFixed(2)}</td>
+                    </tr>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading trades:', error);
+            }
+        }
+
+        // Initialize
+        estimateSignals();
+        loadTradeHistory();
+        setInterval(updateDashboard, 5000);
+        setInterval(updateCountdown, 1000);
+        setInterval(loadTradeHistory, 30000);
+        updateDashboard();
+    </script>
+</body>
+</html>
